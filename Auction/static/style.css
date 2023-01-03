@@ -1,0 +1,27 @@
+.navbar-brand {
+    padding-left: 2rem;
+}
+
+.navbar-right {
+    margin-left: auto;
+    padding-right: 2rem;
+}
+
+.nav-after {
+    padding-top: 70px;
+}
+
+.align-right {
+    padding-left: 15rem;
+}
+
+.table {
+    table-layout: auto;
+    width: 75%;
+    margin-top: 30px;
+    margin-left: 12rem;
+}
+
+#poster {
+    color: royalblue;
+}

@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Home Page</title>
+{% endblock %}
+
+{% block navbar %}
+<ul class="navbar-nav">
+    <li class="nav-item">
+        <a href="{{ url_for('views.index') }}" class="nav-link active disabled">Home</a>
+    </li>
+    {% if current_user.is_authenticated %}
+    <li class="nav-item">
+        <div class="dropdown">
+            <button type="button" class="btn btn-primary dropdown-toggle nav-link" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                My Wallet
+            </button>
+            <form class="dropdown-menu p-4" action="{{ url_for('views.add_money') }}" method="post">
+                <div class="mb-3">
+                    Your Wallet has {{ amount }}
+                </div>
+                <div class="mb-3">
+                    <label for="exampleDropdownFormEmail2" class="form-label">Add Money</label>
+                    <input type="text" name="amount" class="form-control" id="exampleDropdownFormEmail2" placeholder="amount">
+                </div>
+                <button type="submit" class="btn btn-primary">Add to your wallet</button>
+            </form>
+        </div>
+    </li>
+    <li class="nav-item">
+        <a href="{{ url_for('views.sell', amt=amount) }}" class="nav-link">
+            <button type="button" class="btn btn-outline-warning">Become a Seller</button>
+        </a>
+    </li>
+    {% endif %}
+</ul>
+<ul class="navbar-nav navbar-right">
+    {% if not current_user.is_authenticated %}
+    <li class="nav-item">
+        <a href="{{ url_for('auth_views.signin') }}" class="nav-link">SignIn</a>
+    </li>
+    <li class="nav-item">
+        <a href="{{ url_for('auth_views.signup') }}" class="nav-link">SignUp</a>
+    </li>
+    {% else %}
+    <li class="nav-item">
+        <a href="{{ url_for('auth_views.signout') }}" class="nav-link" style="color: #960019;">Logout</a>
+    </li>
+    {% endif %}
+</ul>
+{% endblock %}
+
+{% block content %}
+<section class="nav-after" style="background-color: #d3f5ef;">
+    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{{ url_for('static', filename='images/img1.jpg') }}" class="d-block" style="width: 100%; height: 500px;" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ url_for('static', filename='images/img2.jpg') }}" class="d-block" style="width: 100%; height: 500px;" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ url_for('static', filename='images/img3.jpg') }}" class="d-block" style="width: 100%; height: 500px;" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ url_for('static', filename='images/img4.jpg') }}" class="d-block" style="width: 100%; height: 500px;" alt="...">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" style="background-color: black;" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" style="background-color: black;" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+    <!-- <div class="row d-flex">
+        <div class="col-md-6 align-right">
+            <img src="{{ url_for('static', filename='images/offer.webp') }}" alt="image not found">
+        </div>
+
+        <div class="col-md-6 mt-5">
+            
+        </div>
+    </div> -->
+
+    <div class="text-center">
+        <h1 id="poster">Hurry Up!</h1>
+        <h4 id="poster">UNLIMITED ITEMS &&& EXCITING OFFERS</h4>
+        <h4 id="poster">BUT LIMITED TIME!!!</h4>
+        <br><br>
+        {% if not current_user.is_authenticated %}
+        <h4 id="poster">Click below to create your account now!!</h4>
+        <a href="{{ url_for('auth_views.signup') }}">
+            <button type="button" class="btn btn-primary btn-lg">Create Account</button>
+        </a>
+        {% endif %}
+
+        {% if message %}
+        {% for msg in message %}
+        <h4>{{ msg }}</h4><br>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    <table class="table table-success table-striped">
+        <thead>
+            <tr>
+                <th scope="col" style="width: 35px;">#</th>
+                <th scope="col" style="width: 350px;">Items</th>
+                <th scope="col" style="width: 300px;">
+                    <select name="category" aria-label="Default select example" onchange="location = this.value;">
+                        <option selected>Select Category</option>
+                        <option value="{{ url_for('views.index', cat='All') }}">All Items</option>
+                        <option value="{{ url_for('views.index', cat='Mobiles & Tablets') }}">Mobiles & Tablets</option>
+                        <option value="{{ url_for('views.index', cat='Electronics') }}">Electronics</option>
+                        <option value="{{ url_for('views.index', cat='TVs & Appliances') }}">TVs & Appliances</option>
+                        <option value="{{ url_for('views.index', cat='Fashion') }}">Fashion</option>
+                        <option value="{{ url_for('views.index', cat='Beauty') }}">Beauty</option>
+                        <option value="{{ url_for('views.index', cat='Home & Furniture') }}">Home & Furniture</option>
+                    </select>
+                </th>
+                <th scope="col" style="width: 300px;">Description</th>
+                <th scope="col" style="width: 300px;">Time Remaining</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in range(0, per_page) %}
+            {% if items.items[i] %}
+            <tr>
+                <th scope="row">{{ (page-1)*per_page + i+1 }}</th>
+                <td><a href="{{ url_for('views.details', id=items.items[i].id, amt=amount) }}">
+                    <img src="{{ url_for('static', filename='images/items/'+items.items[i].pic_name) }}" height="300px" alt="">
+                </a></td>
+                <td>{{ items.items[i].category }}</td>
+                <td>{{ items.items[i].description }}</td>
+                <td class="end-time">{{ end[i] }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+        <ul class="pagination mt-3" style="margin-left: 50%;">
+			{% for page_num in items.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+				{% if page_num %}
+					{% if items.page == page_num %}
+						<li class="page-item active" aria-current="page">
+							<a href="{{ url_for('views.index', page=page_num) }}" class="page-link">{{ page_num }}</a>
+						</li>
+					{% else %}
+						<li class="page-item">
+							<a href="{{ url_for('views.index', page=page_num) }}" class="page-link">{{ page_num }}</a>
+						</li>
+					{% endif %}
+				{% else %}
+					...
+				{% endif %}
+			{% endfor %}
+		</ul>
+    </table>
+</section>
+{% endblock %}

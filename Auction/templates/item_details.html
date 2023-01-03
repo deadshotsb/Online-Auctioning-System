@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Home Page</title>
+{% endblock %}
+
+{% block navbar %}
+<ul class="navbar-nav">
+    <li class="nav-item">
+        <a href="{{ url_for('views.index') }}" class="nav-link">Home</a>
+    </li>
+    {% if current_user.is_authenticated %}
+    <li class="nav-item">
+        <div class="dropdown">
+            <button type="button" class="btn btn-primary dropdown-toggle nav-link" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                My Wallet
+            </button>
+            <form class="dropdown-menu p-4" action="{{ url_for('views.add_money') }}" method="post">
+                <div class="mb-3">
+                    Your Wallet has {{ amount }}
+                </div>
+                <div class="mb-3">
+                    <label for="exampleDropdownFormEmail2" class="form-label">Add Money</label>
+                    <input type="text" name="amount" class="form-control" id="exampleDropdownFormEmail2" placeholder="amount">
+                </div>
+                <button type="submit" class="btn btn-primary">Add to your wallet</button>
+            </form>
+        </div>
+    </li>
+    <li class="nav-item">
+        <a href="{{ url_for('views.sell', amt=amount) }}" class="nav-link">
+            <button type="button" class="btn btn-outline-warning">Become a Seller</button>
+        </a>
+    </li>
+    {% endif %}
+</ul>
+<ul class="navbar-nav navbar-right">
+    {% if not current_user.is_authenticated %}
+    <li class="nav-item">
+        <a href="{{ url_for('auth_views.signin') }}" class="nav-link">SignIn</a>
+    </li>
+    <li class="nav-item">
+        <a href="{{ url_for('auth_views.signup') }}" class="nav-link">SignUp</a>
+    </li>
+    {% else %}
+    <li class="nav-item">
+        <a href="{{ url_for('auth_views.signout') }}" class="nav-link" style="color: #960019;">Logout</a>
+    </li>
+    {% endif %}
+</ul>
+{% endblock %}
+
+{% block content %}
+<section class="h-100 gradient-form" style="background-color: #287;">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-xl-10">
+                <div class="card rounded-3 text-black" style="background-color: #eee;">
+                    <div class="row g-0">
+                        <div class="card-body p-md-5 mx-md-4">
+  
+                            <div class="text-center">
+                                <img src="{{ url_for('static', filename='images/items/'+item.pic_name) }}" width="300px" height="300px" alt="">
+                            </div>
+                            {% if error %}
+                            <p class="text-danger">{{ error }}</p>
+                            {% endif %}
+                            {% set bid = curr_bid.split(';')[1] | int %}
+                            {% if item.seller_id != current_user.id %}
+                                {% if curr_bid %}
+                                <div class="my-3">
+                                    <h4>Start your bidding from {{ bid }}</h4>
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                {% if curr_bid %}
+                                <div class="my-3">
+                                    <h4>Current best bid is {{ bid - 1 }}</h4>
+                                </div>
+                                {% endif %}
+                            {% endif %}
+                            <div class="my-3">
+                                <p>Category of the Item <span class="ms-3 px-2" style="border: 2px black solid;">{{ item.category }}</span></p>
+                            </div>
+
+                            <div class="mb-3">
+                                <p style="margin: 0px;">Item Description</p>
+                                <div class="px-2" style="border: 2px black solid;">{{ item.description }}</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <p class="end-time">{{ end[0] }}</p>
+                            </div>
+        
+                            {% if not current_user.is_authenticated %}
+                            <a href="{{ url_for('auth_views.signin') }}">
+                                <div class="text-center d-grid pt-1 mb-5 pb-1">
+                                    <button class="btn btn-primary mb-3" type="button">Login now to start bidding</button>
+                                </div>
+                            </a>
+                            {% elif item.seller_id != current_user.id %}
+                            <form action="{{ url_for('views.item_bid', id=item.id) }}" method="post">
+                                <div class="mb-3">
+                                    <label for="bid" class="form-label pe-3">Bidding Amount</label>
+                                    <div class="d-inline-flex flex-row align-items-center flex-nowrap">
+                                        <input type="text" id="bid" name="bid" class="form-control" placeholder="bid value" required>
+                                    </div>
+                                </div>
+                                <div class="text-center d-grid pt-1 mb-5 pb-1">
+                                    <button class="btn btn-primary mb-3" type="submit" id="disable-it">Bid</button>
+                                </div>
+                            </form>
+                            {% else %}
+                            <a href="{{ url_for('views.delete_item', id=item.id) }}">
+                                <div class="text-center d-grid pt-1 mb-5 pb-1">
+                                    <button class="btn btn-danger mb-3" type="button">Delete Item</button>
+                                </div>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
